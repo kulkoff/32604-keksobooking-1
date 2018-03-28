@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг» [![Build status][travis-image]][travis-url]
 
 * Студент: [Alex Kulkoff](https://up.htmlacademy.ru/javascript/13/user/32604).
-* Наставник: `Нет наставника`.
+* Наставник: `Нет наставника, повторный`.
 
 ---
 
