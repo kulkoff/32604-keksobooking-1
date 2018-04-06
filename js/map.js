@@ -40,12 +40,12 @@ var fragmentPin = document.createDocumentFragment();
 document.querySelector('.map').classList.remove('map--faded');
 
 // Генерируем массив с объектами и отрисовываем кнопки
-for (var i = 0; i < 8; i++) {
-  var objectMap = createPin(i);
+for (var id = 1; id <= 8; id++) {
+  var objectMap = createPin(id);
   fragmentPin.appendChild(renderButtonMap(objectMap));
 
   // Отрисовываем объявление
-  if (i === 0) {
+  if (id === 1) {
     var fragmentAdvert = fragmentPin.appendChild(renderArticleMap(objectMap));
     articleElement.appendChild(fragmentAdvert);
   }
@@ -61,10 +61,10 @@ function createPin(id) {
 
   return {
     author: {
-      avatar: 'img/avatars/user0' + (id + 1) + '.png'
+      avatar: 'img/avatars/user0' + id + '.png'
     },
     offer: {
-      title: titles[id - 1],
+      title: titles.shift(),
       address: xCoord + ', ' + yCoord,
       price: getRandomNumber(minPrice, maxPrice),
       type: getRandomNumberOfArray(types),
@@ -110,7 +110,7 @@ function renderArticleMap(pinData) {
   }
 
   advert.querySelector('.popup__type').textContent = typeOfAccommodation;
-  advert.querySelector('.popup__text--capacity').textContent = pinData.offer.rooms + 'комнат' + ' для ' + pinData.offer.guests + ' гостей';
+  advert.querySelector('.popup__text--capacity').textContent = pinData.offer.rooms + ' комнаты' + ' для ' + pinData.offer.guests + ' гостей';
   advert.querySelector('.popup__text--time').textContent = 'Заезд после ' + pinData.offer.checkin + ', выезд до ' + pinData.offer.checkout;
   var listItems = [];
   for (var j = 0; j < pinData.offer.features.length; j++) {
