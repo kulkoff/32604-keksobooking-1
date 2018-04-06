@@ -2,8 +2,17 @@
 
 // Объявляю переменные, которые в будущем буду использовать для генерации объекта
 
-var types = ['flat', 'house', 'bungalo'];
-var titles = ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец', 'Маленький ужасный дворец', 'Красивый гостевой домик', 'Некрасивый негостеприимный домик', 'Уютное бунгало далеко от моря', 'Неуютное бунгало по колено в воде'];
+var types = ['palace', 'flat', 'house', 'bungalo'];
+var titles = [
+  'Большая уютная квартира',
+  'Маленькая неуютная квартира',
+  'Огромный прекрасный дворец',
+  'Маленький ужасный дворец',
+  'Красивый гостевой домик',
+  'Некрасивый негостеприимный домик',
+  'Уютное бунгало далеко от моря',
+  'Неуютное бунгало по колено в воде'
+];
 var minPrice = 1000;
 var maxPrice = 1000000;
 var roomsMin = 1;
@@ -13,13 +22,10 @@ var maxGuest = 6;
 var times = ['12-00', '13-00', '14-00'];
 var featuresList = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
 var featuresMin = 0;
-var featuresMax = featuresList.length;
 var minXLocation = 300;
 var maxXLocation = 900;
 var minYLocation = 100;
 var maxYLocation = 500;
-
-var mapObjects = []; // Пустой массив, в который вставляем объект
 
 // DOM - элементы
 var buttonElement = document.querySelector('.map__pins');
@@ -27,39 +33,38 @@ var buttonTemplate = document.querySelector('template').content.querySelector('b
 var articleTemplate = document.querySelector('template').content.querySelector('article');
 var articleElement = document.querySelector('section.map');
 
-var fragment = document.createDocumentFragment();
+var fragmentPin = document.createDocumentFragment();
 
 
 // Убираю класс
 document.querySelector('.map').classList.remove('map--faded');
 
-// Генерируем массив с объектами
-for (var i = 1; i <= 8; i++) {
-  mapObjects.push(createObjectMap());
-}
-// Отрисовываем кнопки
-for (i = 0; i < 8; i++) {
-  fragment.appendChild(renderButtonMap(mapObjects));
-}
-buttonElement.appendChild(fragment);
+// Генерируем массив с объектами и отрисовываем кнопки
+for (var i = 0; i < 8; i++) {
+  var objectMap = createPin(i);
+  fragmentPin.appendChild(renderButtonMap(objectMap));
 
-// Отрисовываем объявление
-for (i = 0; i < 1; i++) {
-  var fragmentAdvert = fragment.appendChild(renderArticleMap(mapObjects));
-  articleElement.appendChild(fragmentAdvert);
+  // Отрисовываем объявление
+  if (i === 0) {
+    var fragmentAdvert = fragmentPin.appendChild(renderArticleMap(objectMap));
+    articleElement.appendChild(fragmentAdvert);
+  }
+  buttonElement.appendChild(fragmentPin);
+
+
 }
 
 // Функция генерации объекта
-function createObjectMap() {
+function createPin(id) {
   var xCoord = getRandomNumber(minXLocation, maxXLocation);
   var yCoord = getRandomNumber(minYLocation, maxYLocation);
 
   return {
     author: {
-      avatar: 'img/avatars/user0' + i + '.png'
+      avatar: 'img/avatars/user0' + (id + 1) + '.png'
     },
     offer: {
-      title: titles[i - 1],
+      title: titles[id - 1],
       address: xCoord + ', ' + yCoord,
       price: getRandomNumber(minPrice, maxPrice),
       type: getRandomNumberOfArray(types),
@@ -79,40 +84,40 @@ function createObjectMap() {
 }
 
 // Функция генерации метки
-function renderButtonMap(object) {
+function renderButtonMap(pinData) {
   var button = buttonTemplate.cloneNode(true);
-  button.querySelector('img').src = object[i].author.avatar;
-  button.style.left = object[i].location.x - 20 + 'px';
-  button.style.top = object[i].location.y - 20 + 'px';
+  button.querySelector('img').src = pinData.author.avatar;
+  button.style.left = pinData.location.x - 20 + 'px';
+  button.style.top = pinData.location.y - 20 + 'px';
 
   return button;
 }
 
 // Функция генерации объявления
-function renderArticleMap(object) {
+function renderArticleMap(pinData) {
   var advert = articleTemplate.cloneNode(true);
-  advert.querySelector('.popup__title').textContent = object[i].offer.title;
-  advert.querySelector('.popup__text--address').textContent = object[i].offer.address;
-  advert.querySelector('.popup__text--price').innerHTML = object[i].offer.price + '&#x20bd;/ночь';
+  advert.querySelector('.popup__title').textContent = pinData.offer.title;
+  advert.querySelector('.popup__text--address').textContent = pinData.offer.address;
+  advert.querySelector('.popup__text--price').innerHTML = pinData.offer.price + '&#x20bd;/ночь';
 
   var typeOfAccommodation;
-  if (object[i].offer.type === 'flat') {
+  if (pinData.offer.type === 'flat') {
     typeOfAccommodation = 'Квартира';
-  } else if (object[i].offer.type === 'bungalo') {
+  } else if (pinData.offer.type === 'bungalo') {
     typeOfAccommodation = 'Бунгало';
   } else {
     typeOfAccommodation = 'Дом';
   }
 
   advert.querySelector('.popup__type').textContent = typeOfAccommodation;
-  advert.querySelector('.popup__text--capacity').textContent = object[i].offer.rooms + 'комнат' + ' для ' + object[i].offer.guests + ' гостей';
-  advert.querySelector('.popup__text--time').textContent = 'Заезд после ' + object[i].offer.checkin + ', выезд до ' + object[i].offer.checkout;
+  advert.querySelector('.popup__text--capacity').textContent = pinData.offer.rooms + 'комнат' + ' для ' + pinData.offer.guests + ' гостей';
+  advert.querySelector('.popup__text--time').textContent = 'Заезд после ' + pinData.offer.checkin + ', выезд до ' + pinData.offer.checkout;
   var listItems = [];
-  for (var j = 0; j < object[i].offer.features.length; j++) {
-    listItems.push('<li class="feature feature--' + object[i].offer.features[j] + '"></li>');
+  for (var j = 0; j < pinData.offer.features.length; j++) {
+    listItems.push('<li class="feature feature--' + pinData.offer.features[j] + '"></li>');
   }
   advert.querySelector('.popup__features').innerHTML = listItems.join(' ');
-  advert.querySelector('.popup__avatar').src = object[i].author.avatar;
+  advert.querySelector('.popup__avatar').src = pinData.author.avatar;
 
   return advert;
 }
@@ -127,5 +132,5 @@ function getRandomNumberOfArray(array) {
 }
 
 function makeRandomLengthArray(array) {
-  return array.slice(getRandomNumber(featuresMin, featuresMax));
+  return array.slice(getRandomNumber(featuresMin, featuresList.length));
 }
