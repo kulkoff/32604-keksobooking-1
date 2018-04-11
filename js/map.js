@@ -31,29 +31,70 @@ var maxYLocation = 500;
 var buttonElement = document.querySelector('.map__pins');
 var buttonTemplate = document.querySelector('template').content.querySelector('button.map__pin');
 var articleTemplate = document.querySelector('template').content.querySelector('article');
-var articleElement = document.querySelector('section.map');
-
+var map = document.querySelector('section.map');
 var fragmentPin = document.createDocumentFragment();
 
+// Элементы формы и карты
+var formFieldsets = document.querySelectorAll('.ad-form fieldset');
+var form = document.querySelector('.ad-form ');
+var pinMain = document.querySelector('.map__pin--main');
 
-// Убираю класс
-document.querySelector('.map').classList.remove('map--faded');
+
+disableFields(formFieldsets);
+
+pinMain.addEventListener('mouseup', drawPins);
+
+buttonElement.addEventListener('click', function (e) {
+  var target = e.target.parentNode;
+  console.log(target);
+  if (target.tagName !== 'BUTTON' || target.classList.contains('map__pin--main')) {
+    return;
+  }
+  changeSelectPinActive(target);
+
+  // removePopup();
+  createPopup(target.pinData);
+
+  // document.addEventListener('keydown', onPopEscPress);
+});
+
 
 // Генерируем массив с объектами и отрисовываем кнопки
-for (var id = 1; id <= 8; id++) {
-  var objectMap = createPin(id);
-  fragmentPin.appendChild(renderButtonMap(objectMap));
-
-  // Отрисовываем объявление
-  if (id === 1) {
-    var fragmentAdvert = fragmentPin.appendChild(renderArticleMap(objectMap));
-    articleElement.appendChild(fragmentAdvert);
+function drawPins() {
+  map.classList.remove('map--faded');
+  enableFields(formFieldsets);
+  fillCoordinates();
+  for (var id = 1; id <= 8; id++) {
+    var objectMap = createPin(id);
+    fragmentPin.appendChild(renderButtonMap(objectMap));
+    buttonElement.appendChild(fragmentPin);
+    pinMain.removeEventListener('mouseup', drawPins);
   }
-  buttonElement.appendChild(fragmentPin);
-
-
 }
 
+// Отрисовываем объявление
+// if (id === 1) {
+//   var fragmentAdvert = fragmentPin.appendChild(renderArticleMap(objectMap));
+//   map.appendChild(fragmentAdvert);
+// }
+
+// Функция скрывающая поля
+function disableFields(arrayFields) {
+  for (var i = 0; i < arrayFields.length; i++) {
+    arrayFields[i].disabled = true;
+  }
+  map.classList.add('map--faded');
+  form.classList.add('ad-form--disabled');
+}
+
+// Функция отображения скрытых полей
+function enableFields(arrayFields) {
+  for (var i = 0; i < arrayFields.length; i++) {
+    arrayFields[i].disabled = false;
+  }
+  map.classList.remove('map--faded');
+  form.classList.remove('ad-form--disabled');
+}
 // Функция генерации объекта
 function createPin(id) {
   var xCoord = getRandomNumber(minXLocation, maxXLocation);
@@ -120,6 +161,30 @@ function renderArticleMap(pinData) {
   advert.querySelector('.popup__avatar').src = pinData.author.avatar;
 
   return advert;
+}
+
+// Функция смены класса активного пина
+function changeSelectPinActive(targetNode) {
+  var activePinNode = document.querySelector('.map__pin--active');
+  if (activePinNode) {
+    activePinNode.classList.remove('map__pin--active');
+  }
+  targetNode.classList.add('map__pin--active');
+}
+
+// Функция получения координат пина
+function fillCoordinates() {
+  var xCoordinate = parseInt(document.querySelector('.map__pin--main').style.left, 10) + 32.5;
+  var yCoordinate = parseInt(document.querySelector('.map__pin--main').style.top, 10) + 65 + 16;
+  var inputCoordinates = document.querySelector('#address');
+  inputCoordinates.value = xCoordinate + ', ' + yCoordinate;
+}
+
+// Функция генерации попапа
+
+function createPopup(data) {
+  var noticeNode = renderArticleMap(data);
+  map.appendChild(noticeNode);
 }
 
 // Функции рандомайзеры
