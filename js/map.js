@@ -114,7 +114,7 @@ numberOfRoom.addEventListener('change', function () {
     capacityRoom.options[3].disabled = false;
     capacityRoom.options[3].selected = true;
   }
-})
+});
 
 // Добавляю disable форме
 disableFields(formFieldsets);
