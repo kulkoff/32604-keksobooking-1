@@ -1,5 +1,8 @@
 'use strict';
 
+var ESC_KEYCODE = 27;
+var ENTER_KEYCODE = 13;
+
 // Объявляю переменные, которые в будущем буду использовать для генерации объекта
 
 var types = ['palace', 'flat', 'house', 'bungalo'];
@@ -28,7 +31,7 @@ var minYLocation = 100;
 var maxYLocation = 500;
 
 // DOM - элементы
-var buttonElement = document.querySelector('.map__pins');
+var pinContainer = document.querySelector('.map__pins');
 var buttonTemplate = document.querySelector('template').content.querySelector('button.map__pin');
 var articleTemplate = document.querySelector('template').content.querySelector('article');
 var map = document.querySelector('section.map');
@@ -40,43 +43,73 @@ var form = document.querySelector('.ad-form ');
 var pinMain = document.querySelector('.map__pin--main');
 
 
+// Добавляю disable форме
 disableFields(formFieldsets);
 
+// Активация карты
 pinMain.addEventListener('mouseup', drawPins);
 
-buttonElement.addEventListener('click', function (e) {
+// клик на нажатие пина
+pinContainer.addEventListener('click', function (e) {
   var target = e.target.parentNode;
-  console.log(target);
   if (target.tagName !== 'BUTTON' || target.classList.contains('map__pin--main')) {
     return;
   }
   changeSelectPinActive(target);
-
-  // removePopup();
+  removePopup();
   createPopup(target.pinData);
 
-  // document.addEventListener('keydown', onPopEscPress);
+  document.addEventListener('keydown', onPopEscPress); // Закрытие на ESC
+
+});
+
+// Закрытие попапа на крестик
+map.addEventListener('click', function (e) {
+  var target = e.target;
+  if (target.tagName === 'BUTTON' && target.classList.contains('popup__close')) {
+    removePopup();
+    changeSelectPinActive(target);
+  }
+
 });
 
 
-// Генерируем массив с объектами и отрисовываем кнопки
+// Открываем попап на ENTER
+pinContainer.addEventListener('keydown', function (e) {
+  if (e.target.tagName !== 'BUTTON' || e.target.classList.contains('map__pin--main') || e.keyCode !== ENTER_KEYCODE) {
+    return;
+  }
+  changeSelectPinActive(e.target);
+  removePopup();
+  createPopup(e.target.pinData);
+
+  document.addEventListener('keydown', onPopEscPress);
+});
+
+// Закрытие попапа на крестик
+map.addEventListener('keydown', function (e) {
+  var target = e.target;
+  if (target.tagName === 'BUTTON' && target.classList.contains('popup__close') && e.keyCode === ENTER_KEYCODE) {
+    removePopup();
+    changeSelectPinActive(target);
+  }
+
+});
+
+// Функция, которая генерируем массив с объектами и отрисовываем кнопки
 function drawPins() {
   map.classList.remove('map--faded');
   enableFields(formFieldsets);
   fillCoordinates();
   for (var id = 1; id <= 8; id++) {
-    var objectMap = createPin(id);
-    fragmentPin.appendChild(renderButtonMap(objectMap));
-    buttonElement.appendChild(fragmentPin);
+    var pinData = createPinData(id);
+    var pinNode = createPinButton(pinData);
+    pinNode.pinData = pinData;
+    fragmentPin.appendChild(pinNode);
+    pinContainer.appendChild(fragmentPin);
     pinMain.removeEventListener('mouseup', drawPins);
   }
 }
-
-// Отрисовываем объявление
-// if (id === 1) {
-//   var fragmentAdvert = fragmentPin.appendChild(renderArticleMap(objectMap));
-//   map.appendChild(fragmentAdvert);
-// }
 
 // Функция скрывающая поля
 function disableFields(arrayFields) {
@@ -96,7 +129,7 @@ function enableFields(arrayFields) {
   form.classList.remove('ad-form--disabled');
 }
 // Функция генерации объекта
-function createPin(id) {
+function createPinData(id) {
   var xCoord = getRandomNumber(minXLocation, maxXLocation);
   var yCoord = getRandomNumber(minYLocation, maxYLocation);
 
@@ -125,7 +158,7 @@ function createPin(id) {
 }
 
 // Функция генерации метки
-function renderButtonMap(pinData) {
+function createPinButton(pinData) {
   var button = buttonTemplate.cloneNode(true);
   button.querySelector('img').src = pinData.author.avatar;
   button.style.left = pinData.location.x - 20 + 'px';
@@ -135,7 +168,7 @@ function renderButtonMap(pinData) {
 }
 
 // Функция генерации объявления
-function renderArticleMap(pinData) {
+function renderAdvertOnMap(pinData) {
   var advert = articleTemplate.cloneNode(true);
   advert.querySelector('.popup__title').textContent = pinData.offer.title;
   advert.querySelector('.popup__text--address').textContent = pinData.offer.address;
@@ -172,6 +205,14 @@ function changeSelectPinActive(targetNode) {
   targetNode.classList.add('map__pin--active');
 }
 
+// Функция деактивации пина
+function deactivatePin() {
+  var activePinNode = document.querySelector('.map__pin--active');
+  if (activePinNode) {
+    activePinNode.classList.remove('map__pin--active');
+  }
+}
+
 // Функция получения координат пина
 function fillCoordinates() {
   var xCoordinate = parseInt(document.querySelector('.map__pin--main').style.left, 10) + 32.5;
@@ -182,9 +223,30 @@ function fillCoordinates() {
 
 // Функция генерации попапа
 
-function createPopup(data) {
-  var noticeNode = renderArticleMap(data);
-  map.appendChild(noticeNode);
+function createPopup(pinData) {
+  var noticeNode = renderAdvertOnMap(pinData);
+  var fragmentAdvert = fragmentPin.appendChild(noticeNode);
+  map.appendChild(fragmentAdvert);
+}
+
+// Удаляю попап
+
+function removePopup() {
+  var popup = map.querySelector('.popup');
+  if (popup) {
+    popup.remove();
+  }
+}
+
+
+// Обработчик нажатия на ESC
+function onPopEscPress(event) {
+  var popup = map.querySelector('.popup');
+  if (popup && event.keyCode === ESC_KEYCODE) {
+    removePopup();
+    deactivatePin();
+    document.removeEventListener('keydown', onPopEscPress);
+  }
 }
 
 // Функции рандомайзеры
