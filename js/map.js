@@ -172,7 +172,7 @@ function renderAdvertOnMap(pinData) {
   var advert = articleTemplate.cloneNode(true);
   advert.querySelector('.popup__title').textContent = pinData.offer.title;
   advert.querySelector('.popup__text--address').textContent = pinData.offer.address;
-  advert.querySelector('.popup__text--price').innerHTML = pinData.offer.price + '&#x20bd;/ночь';
+  advert.querySelector('.popup__text--price').innerHTML = pinData.offer.price + ' &#x20bd;/ночь';
 
   var typeOfAccommodation;
   if (pinData.offer.type === 'flat') {
