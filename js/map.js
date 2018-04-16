@@ -29,6 +29,11 @@ var minXLocation = 300;
 var maxXLocation = 900;
 var minYLocation = 100;
 var maxYLocation = 500;
+var photoLinks = [
+  'http://o0.github.io/assets/images/tokyo/hotel1.jpg',
+  'http://o0.github.io/assets/images/tokyo/hotel2.jpg',
+  'http://o0.github.io/assets/images/tokyo/hotel3.jpg'
+];
 
 // DOM - элементы
 var pinContainer = document.querySelector('.map__pins');
@@ -221,7 +226,7 @@ function createPinData(id) {
       checkout: getRandomNumberOfArray(times),
       features: makeRandomLengthArray(featuresList),
       description: '',
-      photos: []
+      photos: getRandomNumberOfArray(photoLinks)
     },
     location: {
       x: xCoord,
@@ -265,6 +270,7 @@ function renderAdvertOnMap(pinData) {
   }
   advert.querySelector('.popup__features').innerHTML = listItems.join(' ');
   advert.querySelector('.popup__avatar').src = pinData.author.avatar;
+  advert.querySelector('.popup__photo').src = pinData.offer.photos;
 
   return advert;
 }
