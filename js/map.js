@@ -36,6 +36,7 @@ var photoLinks = [
 ];
 
 // DOM - элементы
+var body = document.querySelector('body');
 var pinContainer = document.querySelector('.map__pins');
 var buttonTemplate = document.querySelector('template').content.querySelector('button.map__pin');
 var articleTemplate = document.querySelector('template').content.querySelector('article');
@@ -127,6 +128,71 @@ disableFields(formFieldsets);
 // Активация карты
 pinMain.addEventListener('mouseup', drawPins);
 
+// Перетаскивание пина
+pinMain.addEventListener('mousedown', function (e) {
+  e.preventDefault();
+  var startCoords = {
+    x: e.clientX,
+    y: e.clientY
+  };
+
+  var onMouseMove = function (moveEvt) {
+    moveEvt.preventDefault();
+
+    var shift = {
+      x: startCoords.x - moveEvt.clientX,
+      y: startCoords.y - moveEvt.clientY
+    };
+
+    startCoords = {
+      x: moveEvt.clientX,
+      y: moveEvt.clientY
+    };
+
+    var limitYTop = 100 - 81;
+    var limitYBottom = 500 - 81;
+    var limitXLeft = body.offsetLeft - 32.5;
+    var limitXRight = body.offsetLeft + body.offsetWidth - 32.5;
+
+    // Высчитываем рамки для передвижения пина
+    var pinPlaceY = pinMain.offsetTop - shift.y;
+    var pinPlaceX = pinMain.offsetLeft - shift.x;
+
+    if (pinPlaceY > limitYBottom) {
+      pinPlaceY = limitYBottom;
+    } else if (pinPlaceY < limitYTop) {
+      pinPlaceY = limitYTop;
+    } else {
+      pinPlaceY = pinMain.offsetTop - shift.y;
+    }
+
+    if (pinPlaceX > limitXRight) {
+      pinPlaceX = limitXRight;
+    } else if (pinPlaceX < limitXLeft) {
+      pinPlaceX = limitXLeft;
+    } else {
+      pinPlaceX = pinMain.offsetLeft - shift.x;
+    }
+
+    pinMain.style.top = pinPlaceY + 'px';
+    pinMain.style.left = pinPlaceX + 'px';
+
+    fillCoordinates();
+  };
+
+  var onMouseUp = function (upEvt) {
+    upEvt.preventDefault();
+
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+  };
+
+  document.addEventListener('mousemove', onMouseMove);
+  document.addEventListener('mouseup', onMouseUp);
+
+});
+
+
 // клик на нажатие пина
 pinContainer.addEventListener('click', function (e) {
   var target = e.target.parentNode;
@@ -176,17 +242,19 @@ map.addEventListener('keydown', function (e) {
 
 // Функция, которая генерируем массив с объектами и отрисовываем кнопки
 function drawPins() {
-  map.classList.remove('map--faded');
-  enableFields(formFieldsets);
-  fillCoordinates();
-  for (var id = 1; id <= 8; id++) {
-    var pinData = createPinData(id);
-    var pinNode = createPinButton(pinData);
-    pinNode.pinData = pinData;
-    fragmentPin.appendChild(pinNode);
-    pinContainer.appendChild(fragmentPin);
-    pinMain.removeEventListener('mouseup', drawPins);
+
+  if (map.classList.contains('map--faded')) {
+    for (var id = 1; id <= 8; id++) {
+      var pinData = createPinData(id);
+      var pinNode = createPinButton(pinData);
+      pinNode.pinData = pinData;
+      fragmentPin.appendChild(pinNode);
+    }
   }
+
+  enableFields(formFieldsets);
+  pinContainer.appendChild(fragmentPin);
+  pinMain.removeEventListener('mouseup', drawPins);
 }
 
 // Функция скрывающая поля
@@ -239,8 +307,8 @@ function createPinData(id) {
 function createPinButton(pinData) {
   var button = buttonTemplate.cloneNode(true);
   button.querySelector('img').src = pinData.author.avatar;
-  button.style.left = pinData.location.x - 20 + 'px';
-  button.style.top = pinData.location.y - 20 + 'px';
+  button.style.left = pinData.location.x - 25 + 'px';
+  button.style.top = pinData.location.y - 70 + 'px';
 
   return button;
 }
@@ -297,6 +365,8 @@ function fillCoordinates() {
   var xCoordinate = parseInt(document.querySelector('.map__pin--main').style.left, 10) + 32.5;
   var yCoordinate = parseInt(document.querySelector('.map__pin--main').style.top, 10) + 65 + 16;
   var inputCoordinates = document.querySelector('#address');
+  inputCoordinates.disabled = false;
+  inputCoordinates.readOnly = true;
   inputCoordinates.value = xCoordinate + ', ' + yCoordinate;
 }
 
