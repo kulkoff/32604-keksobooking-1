@@ -32,7 +32,7 @@
       advert.querySelector('.popup__avatar').src = pinData.author.avatar;
       var imgItems = [];
       for (j = 0; j < pinData.offer.photos.length; j++) {
-        imgItems.push('<img src="' + pinData.offer.photos[j] + '" class="popup__photo" width="45" height="40" alt="Фотография жилья' + j + '">');
+        imgItems.push('<img src="' + pinData.offer.photos[j] + '" class="popup__photo" width="45" height="40" style="margin-bottom: 5px" alt="Фотография жилья' + j + '">');
       }
       advert.querySelector('.popup__photos').innerHTML = imgItems.join(' ');
 
