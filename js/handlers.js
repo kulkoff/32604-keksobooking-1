@@ -128,14 +128,16 @@
   });
 
   // Отправка формы
-  var buttonForm = document.querySelector('.ad-form__submit');
   var formReset = document.querySelector('.ad-form__reset');
   var formData = document.querySelector('.ad-form');
+  var successBlock = document.querySelector('.success');
   // var onErrorCallback = errorCallback();
-  buttonForm.addEventListener('submit', function (evt) {
+  formData.addEventListener('submit', function (evt) {
     evt.preventDefault();
+
     window.backend.save(new FormData(formData), function () {
       formReset.click();
+      successBlock.classList.remove('hidden');
     }, onErrorCallback);
   });
 
@@ -144,7 +146,7 @@
     errorNode.style = 'z-index: 100; top: 1600px; position: absolute; margin: 0 auto; width: 1200px; height: 40px; text-align: center;  background-color: rgb(253, 94, 83); font-size: 35px; color: white;';
     errorNode.textContent = errorMessage + ' Пожалуйста перезагрузите страницу.';
     document.body.insertAdjacentElement('afterbegin', errorNode);
-  }
+  };
 
   // Функция получения координат
   function fillCoordinates() {
