@@ -25,7 +25,7 @@
       advert.querySelector('.popup__text--time').textContent = 'Заезд после ' + pinData.offer.checkin + ', выезд до ' + pinData.offer.checkout;
       var listItems = [];
       for (var j = 0; j < pinData.offer.features.length; j++) {
-        listItems.push('<li class="feature feature--' + pinData.offer.features[j] + '"></li>');
+        listItems.push('<li class="popup__feature popup__feature--' + pinData.offer.features[j] + '"></li>');
       }
       advert.querySelector('.popup__description').textContent = pinData.offer.description;
       advert.querySelector('.popup__features').innerHTML = listItems.join(' ');
