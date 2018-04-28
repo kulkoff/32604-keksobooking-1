@@ -25,11 +25,16 @@
       advert.querySelector('.popup__text--time').textContent = 'Заезд после ' + pinData.offer.checkin + ', выезд до ' + pinData.offer.checkout;
       var listItems = [];
       for (var j = 0; j < pinData.offer.features.length; j++) {
-        listItems.push('<li class="feature feature--' + pinData.offer.features[j] + '"></li>');
+        listItems.push('<li class="popup__feature popup__feature--' + pinData.offer.features[j] + '"></li>');
       }
+      advert.querySelector('.popup__description').textContent = pinData.offer.description;
       advert.querySelector('.popup__features').innerHTML = listItems.join(' ');
       advert.querySelector('.popup__avatar').src = pinData.author.avatar;
-      advert.querySelector('.popup__photo').src = pinData.offer.photos;
+      var imgItems = [];
+      for (j = 0; j < pinData.offer.photos.length; j++) {
+        imgItems.push('<img src="' + pinData.offer.photos[j] + '" class="popup__photo" width="45" height="40" style="margin-bottom: 5px" alt="Фотография жилья' + j + '">');
+      }
+      advert.querySelector('.popup__photos').innerHTML = imgItems.join(' ');
 
       return advert;
     },

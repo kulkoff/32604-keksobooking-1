@@ -40,6 +40,7 @@
     }
 
   });
+
   // Обработчик нажатия на ESC
   function onPopEscPress(event) {
     var popup = document.querySelector('.popup');
@@ -49,6 +50,7 @@
       document.removeEventListener('keydown', onPopEscPress);
     }
   }
+
   // Открываем попап на ENTER
   pinContainer.addEventListener('keydown', function (e) {
     if (e.target.tagName !== 'BUTTON' || e.target.classList.contains('map__pin--main') || e.keyCode !== ENTER_KEYCODE) {
@@ -61,6 +63,7 @@
     document.addEventListener('keydown', onPopEscPress);
   });
 
+  // Перемещение пина
   pinMain.addEventListener('mousedown', function (e) {
     e.preventDefault();
     var startCoords = {
@@ -124,6 +127,28 @@
 
   });
 
+  // Отправка формы
+  var formReset = document.querySelector('.ad-form__reset');
+  var formData = document.querySelector('.ad-form');
+  var successBlock = document.querySelector('.success');
+  // var onErrorCallback = errorCallback();
+  formData.addEventListener('submit', function (evt) {
+    evt.preventDefault();
+
+    window.backend.save(new FormData(formData), function () {
+      formReset.click();
+      successBlock.classList.remove('hidden');
+    }, onErrorCallback);
+  });
+
+  var onErrorCallback = function (errorMessage) {
+    var errorNode = document.createElement('div');
+    errorNode.style = 'z-index: 100; top: 1600px; position: absolute; margin: 0 auto; width: 1200px; height: 40px; text-align: center;  background-color: rgb(253, 94, 83); font-size: 35px; color: white;';
+    errorNode.textContent = errorMessage + ' Пожалуйста перезагрузите страницу.';
+    document.body.insertAdjacentElement('afterbegin', errorNode);
+  };
+
+  // Функция получения координат
   function fillCoordinates() {
     var xCoordinate = parseInt(document.querySelector('.map__pin--main').style.left, 10) + 32;
     var yCoordinate = parseInt(document.querySelector('.map__pin--main').style.top, 10) + 65 + 16;
