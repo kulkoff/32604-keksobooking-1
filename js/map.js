@@ -11,7 +11,7 @@
   // Функция, которая генерируем массив с объектами и отрисовываем кнопки
   function drawPins() {
     if (map.classList.contains('map--faded')) {
-      for (var id = 1; id <= 9; id++) {
+      for (var id = 0; id <= 9; id++) {
         var pinData = window.map.dataPins[id];
         var pinNode = window.pin.createPinButton(pinData);
         pinNode.pinData = pinData;
