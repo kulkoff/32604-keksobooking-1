@@ -23,49 +23,55 @@
     filterObject.features = features;
     window.clearTimeout(prevTimer);
     prevTimer = window.setTimeout(function () {
-      filterPins();
+      window.filter.filterPins();
     }, 500);
   });
 
   // Функця фильтрации пинов
-  function filterPins() {
-    var pinNodes = Array.from(pinContainer.children).slice(2);
-    pinNodes.filter(function (pinNode) {
-      var isPassed = true;
-      var offer = pinNode.pinData.offer;
-      for (var key in offer) {
-        if (offer.hasOwnProperty(key)) {
-          var isPassedKey;
-          var value = offer[key];
-          if (filterObject[key] === 'any') {
-            continue;
-          } else if (key === 'type') {
-            isPassedKey = filterObject.type === value;
-          } else if (key === 'rooms') {
-            isPassedKey = filterObject.rooms === String(value);
-          } else if (key === 'guests') {
-            isPassedKey = filterObject.guests === String(value);
-          } else if (key === 'price') {
-            isPassedKey = priceFilter(value);
-          } else if (key === 'features') {
-            isPassedKey = featuresFilter(value);
-          }
-          if (isPassedKey === false) {
-            isPassed = false;
-            break;
+  window.filter = {
+    filterPins: function () {
+      pinSelectors.forEach(function (array) {
+        filterObject[array.name.substr(8)] = array.value;
+      });
+      var pinNodes = Array.from(pinContainer.children).slice(2);
+      pinNodes.filter(function (pinNode) {
+        var isPassed = true;
+        var offer = pinNode.pinData.offer;
+        for (var key in offer) {
+          if (offer.hasOwnProperty(key)) {
+            var isPassedKey;
+            var value = offer[key];
+            if (filterObject[key] === 'any') {
+              continue;
+            } else if (key === 'type') {
+              isPassedKey = filterObject.type === value;
+            } else if (key === 'rooms') {
+              isPassedKey = filterObject.rooms === String(value);
+            } else if (key === 'guests') {
+              isPassedKey = filterObject.guests === String(value);
+            } else if (key === 'price') {
+              isPassedKey = priceFilter(value);
+            } else if (key === 'features') {
+              isPassedKey = featuresFilter(value);
+            }
+            if (isPassedKey === false) {
+              isPassed = false;
+              break;
+            }
           }
         }
-      }
-      if (isPassed === false) {
-        pinNode.classList.add('hidden');
-        var popup = document.querySelector('.popup');
-        window.pin.deactivatePin();
-        window.card.removePopup(popup);
-      } else if (isPassed === true && pinNode.classList.contains('hidden') === true) {
-        pinNode.classList.remove('hidden');
-      }
-    });
-  }
+        if (isPassed === false) {
+          pinNode.classList.add('hidden');
+          var popup = document.querySelector('.popup');
+          window.pin.deactivatePin();
+          window.card.removePopup(popup);
+        } else if (isPassed === true && pinNode.classList.contains('hidden') === true) {
+          pinNode.classList.remove('hidden');
+        }
+      });
+    }
+  };
+
 
   // Проервка совпадения цены
   function priceFilter(value) {

@@ -21,6 +21,7 @@
 
     window.form.enableFields();
     pinContainer.appendChild(fragmentPin);
+    window.filter.filterPins();
     pinMain.removeEventListener('mouseup', drawPins);
   }
   // Коллбеки для загрузки
