@@ -9,7 +9,7 @@
       button.querySelector('img').src = pinData.author.avatar;
       button.style.left = pinData.location.x - 25 + 'px';
       button.style.top = pinData.location.y - 70 + 'px';
-      // button.classList.add('hidden');
+      button.classList.add('hidden');
 
       return button;
     },

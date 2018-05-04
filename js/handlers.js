@@ -8,6 +8,7 @@
   var map = document.querySelector('section.map');
   var body = document.querySelector('body');
   var pinMain = document.querySelector('.map__pin--main');
+  var clearButton = document.querySelector('.ad-form__reset');
 
   // клик на нажатие пина
   pinContainer.addEventListener('click', function (e) {
@@ -138,6 +139,7 @@
     window.backend.save(new FormData(formData), function () {
       formReset.click();
       successBlock.classList.remove('hidden');
+      resetPage();
     }, onErrorCallback);
   });
 
@@ -147,6 +149,40 @@
     errorNode.textContent = errorMessage + ' Пожалуйста перезагрузите страницу.';
     document.body.insertAdjacentElement('afterbegin', errorNode);
   };
+
+  // Коллбеки для загрузки
+  var onloadData = function (data) {
+    window.map = {
+      dataPins: data
+    };
+  };
+
+  var onErrorDataLoad = function (errorMessage) {
+    var errorNode = document.createElement('div');
+    errorNode.style = 'z-index: 100; top: 0px; position: fixed; margin: 0 auto; width: 1200px; height: 40px; text-align: center;  background-color: rgb(253, 94, 83); font-size: 35px; color: white;';
+    errorNode.textContent = errorMessage + ' Пожалуйста перезагрузите страницу.';
+    document.body.insertAdjacentElement('afterbegin', errorNode);
+  };
+
+  // Активация карты
+  window.backend.load(onloadData, onErrorDataLoad);
+  pinMain.addEventListener('mouseup', window.map.drawPins);
+
+  // Клик на нажатие кнопки очистить
+  clearButton.addEventListener('click', resetPage);
+
+
+  // Функция сброса страницы
+  function resetPage() {
+    window.form.disableFields();
+    window.card.removePopup();
+    var pinNodes = Array.from(pinContainer.children).slice(2);
+    pinNodes.forEach(function (e) {
+      e.parentNode.removeChild(e);
+    });
+    clearButton.removeEventListener('click', resetPage);
+    pinMain.addEventListener('mouseup', window.map.drawPins);
+  }
 
   // Функция получения координат
   function fillCoordinates() {
