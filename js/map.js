@@ -6,8 +6,6 @@
   var pinContainer = document.querySelector('.map__pins');
   var fragmentPin = document.createDocumentFragment();
 
-  // Добавляю disable форме
-  window.form.disableFields();
   // Функция, которая генерируем массив с объектами и отрисовываем кнопки
 
   window.map = {

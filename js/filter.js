@@ -10,31 +10,7 @@
   var prevTimer;
 
 
-  // Функця фильтрации пинов
-  window.filter = {
-    onFilterClick: function () {
-      var features = [];
-      pinSelectors.forEach(function (array) {
-        filterObject[array.name.substr(8)] = array.value;
-      });
-      pinInputs.forEach(function (array) {
-        if (array.checked) {
-          features.push(array.value);
-        }
-      });
-      filterObject.features = features;
-      window.clearTimeout(prevTimer);
-      prevTimer = window.setTimeout(function () {
-        filterPins();
-      }, 500);
-    }
-  };
-
-  // Событие клика на фильтр, создание динамического объекта с фильтрами
-  pinFilter.addEventListener('change', window.filter.onFilterClick);
-
-
-  function filterPins() {
+  var filterPins = function () {
     var indexCount = 0;
     var pinNodes = Array.from(pinContainer.children).slice(2);
     pinNodes.filter(function (pinNode) {
@@ -87,10 +63,10 @@
         }
       }
     });
-  }
+  };
 
   // Проервка совпадения цены
-  function priceFilter(value) {
+  var priceFilter = function (value) {
     if (filterObject.price === 'middle') {
       return value >= 10000 && value <= 50000;
     } else if (filterObject.price === 'low') {
@@ -99,10 +75,10 @@
       return value > 50000;
     }
     return false;
-  }
+  };
 
   // Проверка совпадния удобств
-  function featuresFilter(value) {
+  var featuresFilter = function (value) {
     if (filterObject.features.length === 0) {
       return true;
     }
@@ -111,6 +87,30 @@
       return value.includes(feature);
     });
     return featureIn;
-  }
+  };
+
+  // Функця фильтрации пинов
+  window.filter = {
+    onFilterClick: function () {
+      var features = [];
+      pinSelectors.forEach(function (array) {
+        filterObject[array.name.substr(8)] = array.value;
+      });
+      pinInputs.forEach(function (array) {
+        if (array.checked) {
+          features.push(array.value);
+        }
+      });
+      filterObject.features = features;
+      window.clearTimeout(prevTimer);
+      prevTimer = window.setTimeout(function () {
+        filterPins();
+      }, 500);
+    }
+  };
+
+  // Событие клика на фильтр, создание динамического объекта с фильтрами
+  pinFilter.addEventListener('change', window.filter.onFilterClick);
+
 
 })();
