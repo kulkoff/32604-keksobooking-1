@@ -35,9 +35,6 @@
 
 
   function filterPins() {
-    // pinSelectors.forEach(function (array) {
-    //   filterObject[array.name.substr(8)] = array.value;
-    // });
     var indexCount = 0;
     var pinNodes = Array.from(pinContainer.children).slice(2);
     pinNodes.filter(function (pinNode) {
@@ -84,7 +81,7 @@
           }
         } else {
           pinNode.classList.add('hidden');
-          var popup = document.querySelector('.popup');
+          popup = document.querySelector('.popup');
           window.pin.deactivatePin();
           window.card.removePopup(popup);
         }

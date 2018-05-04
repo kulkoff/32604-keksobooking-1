@@ -43,9 +43,9 @@
   });
 
   // Обработчик нажатия на ESC
-  function onPopEscPress(event) {
+  function onPopEscPress(evt) {
     var popup = document.querySelector('.popup');
-    if (popup && event.keyCode === ESC_KEYCODE) {
+    if (popup && evt.keyCode === ESC_KEYCODE) {
       window.card.removePopup();
       window.pin.deactivatePin();
       document.removeEventListener('keydown', onPopEscPress);
