@@ -76,7 +76,9 @@
             var offerValue = offer[filterKey];
 
             // если фильтр имееть any, нет смысла далее проверять
-            if (filterObject[filterKey] === 'any') return true;
+            if (filterObject[filterKey] === 'any') {
+              return true;
+            }
 
             // преобразорвание типа данных
             if (['rooms', 'guests'].includes(filterKey)) {
