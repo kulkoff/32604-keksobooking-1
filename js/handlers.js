@@ -4,10 +4,16 @@
   var ESC_KEYCODE = 27;
   var ENTER_KEYCODE = 13;
 
+
   var pinContainer = document.querySelector('.map__pins');
   var map = document.querySelector('section.map');
   var body = document.querySelector('body');
   var pinMain = document.querySelector('.map__pin--main');
+  var pinButtonWidth = parseInt(getComputedStyle(pinMain).width, 10);
+  var pinButtonHeight = parseInt(getComputedStyle(pinMain).height, 10) + parseInt(getComputedStyle(pinMain, 'after').height, 10);
+  var pinInitialLeft = pinMain.style.left;
+  var pinInitialTop = pinMain.style.top;
+  var clearButton = document.querySelector('.ad-form__reset');
 
   // клик на нажатие пина
   pinContainer.addEventListener('click', function (e) {
@@ -42,14 +48,14 @@
   });
 
   // Обработчик нажатия на ESC
-  function onPopEscPress(event) {
+  var onPopEscPress = function (evt) {
     var popup = document.querySelector('.popup');
-    if (popup && event.keyCode === ESC_KEYCODE) {
+    if (popup && evt.keyCode === ESC_KEYCODE) {
       window.card.removePopup();
       window.pin.deactivatePin();
       document.removeEventListener('keydown', onPopEscPress);
     }
-  }
+  };
 
   // Открываем попап на ENTER
   pinContainer.addEventListener('keydown', function (e) {
@@ -62,6 +68,24 @@
 
     document.addEventListener('keydown', onPopEscPress);
   });
+
+  // Функция получения координат
+  var fillCoordinates = function () {
+    var xCoordinate = parseInt(pinMain.style.left, 10) + pinButtonWidth / 2 - 0.5;
+    var yCoordinate = parseInt(pinMain.style.top, 10) + (pinButtonHeight - 6);
+    var inputCoordinates = document.querySelector('#address');
+    inputCoordinates.disabled = false;
+    inputCoordinates.readOnly = true;
+    inputCoordinates.value = xCoordinate + ', ' + yCoordinate;
+  };
+
+  // Функция удаления координат
+  var resetCoordinates = function () {
+    var inputCoordinates = document.querySelector('#address');
+    inputCoordinates.value = '';
+    pinMain.style.left = pinInitialLeft;
+    pinMain.style.top = pinInitialTop;
+  };
 
   // Перемещение пина
   pinMain.addEventListener('mousedown', function (e) {
@@ -84,10 +108,10 @@
         y: moveEvt.clientY
       };
 
-      var limitYTop = 100 - 81;
-      var limitYBottom = 500 - 81;
-      var limitXLeft = body.offsetLeft - 32.5;
-      var limitXRight = body.offsetLeft + body.offsetWidth - 32.5;
+      var limitYTop = 100 - pinButtonHeight + 6;
+      var limitYBottom = 500 - pinButtonHeight + 6;
+      var limitXLeft = body.offsetLeft - pinButtonWidth / 2;
+      var limitXRight = body.offsetLeft + body.offsetWidth - pinButtonWidth / 2;
 
       // Высчитываем рамки для передвижения пина
       var pinPlaceY = pinMain.offsetTop - shift.y;
@@ -135,11 +159,27 @@
   formData.addEventListener('submit', function (evt) {
     evt.preventDefault();
 
-    window.backend.save(new FormData(formData), function () {
-      formReset.click();
-      successBlock.classList.remove('hidden');
-    }, onErrorCallback);
+    window.backend.save(new FormData(formData), onSuccessCallback, onErrorCallback);
   });
+
+  // Функция сброса страницы
+  var resetPage = function () {
+    window.form.disableFields();
+    resetCoordinates();
+    window.card.removePopup();
+    var pinNodes = Array.from(pinContainer.children).slice(2);
+    pinNodes.forEach(function (e) {
+      e.parentNode.removeChild(e);
+    });
+    pinMain.addEventListener('mouseup', window.map.drawPins);
+  };
+
+  var onSuccessCallback = function () {
+    formReset.click();
+    successBlock.classList.remove('hidden');
+    resetCoordinates();
+    resetPage();
+  };
 
   var onErrorCallback = function (errorMessage) {
     var errorNode = document.createElement('div');
@@ -148,15 +188,31 @@
     document.body.insertAdjacentElement('afterbegin', errorNode);
   };
 
-  // Функция получения координат
-  function fillCoordinates() {
-    var xCoordinate = parseInt(document.querySelector('.map__pin--main').style.left, 10) + 32;
-    var yCoordinate = parseInt(document.querySelector('.map__pin--main').style.top, 10) + 65 + 16;
-    var inputCoordinates = document.querySelector('#address');
-    inputCoordinates.disabled = false;
-    inputCoordinates.readOnly = true;
-    inputCoordinates.value = xCoordinate + ', ' + yCoordinate;
-  }
+  // Коллбеки для загрузки
+  var onloadData = function (data) {
+    window.map = {
+      dataPins: data
+    };
+  };
+
+  var onErrorDataLoad = function (errorMessage) {
+    var errorNode = document.createElement('div');
+    errorNode.style = 'z-index: 100; top: 0px; position: fixed; margin: 0 auto; width: 1200px; height: 40px; text-align: center;  background-color: rgb(253, 94, 83); font-size: 35px; color: white;';
+    errorNode.textContent = errorMessage + ' Пожалуйста перезагрузите страницу.';
+    document.body.insertAdjacentElement('afterbegin', errorNode);
+  };
+
+  // Добавляю disable форме
+  window.form.disableFields();
+
+  // Активация карты
+  window.backend.load(onloadData, onErrorDataLoad);
+  pinMain.addEventListener('mouseup', window.map.drawPins);
+
+  // Клик на нажатие кнопки очистить
+  clearButton.addEventListener('click', resetPage);
+
+
 })();
 
 
