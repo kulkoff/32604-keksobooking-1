@@ -9,62 +9,6 @@
   var filterObject = {};
   var prevTimer;
 
-
-  var filterPins = function () {
-    var indexCount = 0;
-    var pinNodes = Array.from(pinContainer.children).slice(2);
-    pinNodes.filter(function (pinNode) {
-
-      var isPassed = true;
-      var offer = pinNode.pinData.offer;
-      for (var key in offer) {
-        if (offer.hasOwnProperty(key)) {
-          var isPassedKey;
-          var value = offer[key];
-          if (filterObject[key] === 'any') {
-            continue;
-          } else if (key === 'type') {
-            isPassedKey = filterObject.type === value;
-          } else if (key === 'rooms') {
-            isPassedKey = filterObject.rooms === String(value);
-          } else if (key === 'guests') {
-            isPassedKey = filterObject.guests === String(value);
-          } else if (key === 'price') {
-            isPassedKey = priceFilter(value);
-          } else if (key === 'features') {
-            isPassedKey = featuresFilter(value);
-          }
-          if (isPassedKey === false) {
-            isPassed = false;
-            break;
-          }
-        }
-      }
-      if (isPassed === false) {
-        pinNode.classList.add('hidden');
-        var popup = document.querySelector('.popup');
-        window.pin.deactivatePin();
-        window.card.removePopup(popup);
-      } else {
-        indexCount++;
-        popup = document.querySelector('.popup');
-        window.pin.deactivatePin();
-        window.card.removePopup(popup);
-        if (indexCount <= 5) {
-          if (isPassed === true && pinNode.classList.contains('hidden') === true) {
-            pinNode.classList.remove('hidden');
-
-          }
-        } else {
-          pinNode.classList.add('hidden');
-          popup = document.querySelector('.popup');
-          window.pin.deactivatePin();
-          window.card.removePopup(popup);
-        }
-      }
-    });
-  };
-
   // Проервка совпадения цены
   var priceFilter = function (value) {
     if (filterObject.price === 'middle') {
@@ -89,6 +33,13 @@
     return featureIn;
   };
 
+  var filters = {
+    type: null,
+    rooms: null,
+    guests: null,
+    price: priceFilter,
+    features: featuresFilter
+  };
   // Функця фильтрации пинов
   window.filter = {
     onFilterClick: function () {
@@ -111,6 +62,56 @@
 
   // Событие клика на фильтр, создание динамического объекта с фильтрами
   pinFilter.addEventListener('change', window.filter.onFilterClick);
+
+
+  var filterPins = function () {
+    var pinNodes = Array.from(pinContainer.children).slice(2);
+
+    var filteredPins = pinNodes.filter(function (pinNode) {
+      var offer = pinNode.pinData.offer;
+      var filteredKeys = Object
+          .keys(filters)
+          .filter(function (filterKey) {
+            var filterValue = filterObject[filterKey];
+            var offerValue = offer[filterKey];
+
+            // если фильтр имееть any, нет смысла далее проверять
+            if (filterObject[filterKey] === 'any') return true;
+
+            // преобразорвание типа данных
+            if (['rooms', 'guests'].includes(filterKey)) {
+              offerValue = String(offerValue);
+            }
+
+            var result;
+            if (filters[filterKey] !== null) {
+              // делегирование фильтрации функции
+              result = filters[filterKey](offerValue);
+            } else {
+              // принимаем решение сами (без внешних функций)
+              result = offerValue === filterValue;
+            }
+
+            return result;
+          });
+
+      return filteredKeys.length === Object.keys(filters).length;
+    })
+        .slice(0, 5);
+
+    pinNodes.forEach(function (pinNode) {
+      if (filteredPins.includes(pinNode)) {
+        pinNode.classList.remove('hidden');
+      } else {
+        pinNode.classList.add('hidden');
+      }
+
+      if (pinNode.classList.contains('map__pin--active') && pinNode.classList.contains('hidden')) {
+        window.pin.deactivatePin();
+        window.card.removePopup(document.querySelector('.popup'));
+      }
+    });
+  };
 
 
 })();
