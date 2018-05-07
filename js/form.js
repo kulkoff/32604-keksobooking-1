@@ -2,6 +2,18 @@
 
 (function () {
 
+  var ROOMS_TO_CAPACITY = {
+    '1': [2],
+    '2': [2, 1],
+    '3': [2, 1, 0],
+    '100': [3]
+  };
+  var TYPES_MIN_PRICES = {
+    palace: 10000,
+    flat: 1000,
+    house: 5000,
+    bungalo: 0
+  };
   var form = document.querySelector('.ad-form ');
   var map = document.querySelector('.map');
   var typeRoom = document.querySelector('#type');
@@ -11,71 +23,44 @@
   var numberOfRoom = document.querySelector('#room_number');
   var capacityRoom = document.querySelector('#capacity');
 
-  // Синхронизация типа жилья с ценой
-  typeRoom.addEventListener('change', function () {
-    if (typeRoom.options[0].selected === true) {
-      priceRoom.min = 1000;
-      priceRoom.placeholder = 'от 1000 рублей';
-    } else if (typeRoom.options[1].selected === true) {
-      priceRoom.min = 0;
-      priceRoom.placeholder = 'от 0 рублей';
-    } else if (typeRoom.options[2].selected === true) {
-      priceRoom.min = 5000;
-      priceRoom.placeholder = 'от 5000 рублей';
-    } else if (typeRoom.options[3].selected === true) {
-      priceRoom.min = 10000;
-      priceRoom.placeholder = 'от 10000 рублей';
+  var onRoomSelectChange = function (e) {
+    var roomsNumber = e.target.value;
+    var indexesToEnable = ROOMS_TO_CAPACITY[roomsNumber];
+
+    for (var i = 0; i < capacityRoom.length; i++) {
+      capacityRoom.options[i].disabled = true;
+      capacityRoom.options[i].selected = false;
+
+      if (indexesToEnable.includes(i)) {
+        capacityRoom.options[i].disabled = false;
+      }
     }
-  });
+    if (roomsNumber) {
+      capacityRoom.options[indexesToEnable[indexesToEnable.length - 1]].selected = true;
+    }
+  };
+  numberOfRoom.addEventListener('change', onRoomSelectChange);
+
+  // Синхронизация типа жилья с ценой
+  var changePriceInput = function (price) {
+    priceRoom.setAttribute('placeholder', price);
+    priceRoom.setAttribute('min', price);
+  };
+
+  var onHousingTypeChange = function (e) {
+    changePriceInput(TYPES_MIN_PRICES[e.target.value]);
+  };
+  typeRoom.addEventListener('change', onHousingTypeChange);
 
   // Синхронизация времени;
-  timeIn.addEventListener('change', function () {
-    if (timeIn.options[0].selected === true) {
-      timeOut.options[0].selected = true;
-    } else if (timeIn.options[1].selected === true) {
-      timeOut.options[1].selected = true;
-    } else if (timeIn.options[2].selected === true) {
-      timeOut.options[2].selected = true;
-    }
-  });
-  timeOut.addEventListener('change', function () {
-    if (timeOut.options[0].selected === true) {
-      timeIn.options[0].selected = true;
-    } else if (timeOut.options[1].selected === true) {
-      timeIn.options[1].selected = true;
-    } else if (timeOut.options[2].selected === true) {
-      timeIn.options[2].selected = true;
-    }
-  });
-
-  // Синхронизация количества комнат и гостей;
-  numberOfRoom.addEventListener('change', function () {
-    if (numberOfRoom.options[0].selected === true) {
-      capacityRoom.options[0].disabled = true;
-      capacityRoom.options[1].disabled = true;
-      capacityRoom.options[2].disabled = false;
-      capacityRoom.options[2].selected = true;
-      capacityRoom.options[3].disabled = true;
-    } else if (numberOfRoom.options[1].selected === true) {
-      capacityRoom.options[0].disabled = true;
-      capacityRoom.options[1].disabled = false;
-      capacityRoom.options[1].selected = true;
-      capacityRoom.options[2].disabled = false;
-      capacityRoom.options[3].disabled = true;
-    } else if (numberOfRoom.options[2].selected === true) {
-      capacityRoom.options[0].disabled = false;
-      capacityRoom.options[1].disabled = false;
-      capacityRoom.options[2].disabled = false;
-      capacityRoom.options[0].selected = true;
-      capacityRoom.options[3].disabled = true;
-    } else if (numberOfRoom.options[3].selected === true) {
-      capacityRoom.options[0].disabled = true;
-      capacityRoom.options[1].disabled = true;
-      capacityRoom.options[2].disabled = true;
-      capacityRoom.options[3].disabled = false;
-      capacityRoom.options[3].selected = true;
-    }
-  });
+  var onTimeInChange = function (e) {
+    timeOut.value = e.target.value;
+  };
+  var onTimeOutChange = function (e) {
+    timeIn.value = e.target.value;
+  };
+  timeIn.addEventListener('change', onTimeInChange);
+  timeOut.addEventListener('change', onTimeOutChange);
 
   window.form = {
     enableFields: function () {

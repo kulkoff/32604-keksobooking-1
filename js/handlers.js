@@ -3,7 +3,8 @@
 (function () {
   var ESC_KEYCODE = 27;
   var ENTER_KEYCODE = 13;
-
+  var PIN_MIN_Y_VALUE = 150;
+  var PIN_MAX_Y_VALUE = 500;
 
   var pinContainer = document.querySelector('.map__pins');
   var map = document.querySelector('section.map');
@@ -52,7 +53,7 @@
     var popup = document.querySelector('.popup');
     if (popup && evt.keyCode === ESC_KEYCODE) {
       window.card.removePopup();
-      window.pin.deactivatePin();
+      window.pin.deactivatePinButton();
       document.removeEventListener('keydown', onPopEscPress);
     }
   };
@@ -72,7 +73,7 @@
   // Функция получения координат
   var fillCoordinates = function () {
     var xCoordinate = parseInt(pinMain.style.left, 10) + pinButtonWidth / 2 - 0.5;
-    var yCoordinate = parseInt(pinMain.style.top, 10) + (pinButtonHeight - 6);
+    var yCoordinate = parseInt(pinMain.style.top, 10) + (pinButtonHeight);
     var inputCoordinates = document.querySelector('#address');
     inputCoordinates.disabled = false;
     inputCoordinates.readOnly = true;
@@ -108,8 +109,8 @@
         y: moveEvt.clientY
       };
 
-      var limitYTop = 100 - pinButtonHeight + 6;
-      var limitYBottom = 500 - pinButtonHeight + 6;
+      var limitYTop = PIN_MIN_Y_VALUE - pinButtonHeight;
+      var limitYBottom = PIN_MAX_Y_VALUE - pinButtonHeight;
       var limitXLeft = body.offsetLeft - pinButtonWidth / 2;
       var limitXRight = body.offsetLeft + body.offsetWidth - pinButtonWidth / 2;
 
@@ -155,7 +156,7 @@
   var formReset = document.querySelector('.ad-form__reset');
   var formData = document.querySelector('.ad-form');
   var successBlock = document.querySelector('.success');
-  // var onErrorCallback = errorCallback();
+
   formData.addEventListener('submit', function (evt) {
     evt.preventDefault();
 

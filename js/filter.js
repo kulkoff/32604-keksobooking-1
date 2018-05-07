@@ -2,6 +2,10 @@
 
 (function () {
 
+  var MAX_VISIBLE_OFFERS = 5;
+  var LOW_PRICE = 10000;
+  var HIGH_PRICE = 50000;
+
   var pinFilter = document.querySelector('.map__filters');
   var pinContainer = document.querySelector('.map__pins');
   var pinSelectors = Array.from(pinFilter.querySelectorAll('select'));
@@ -12,11 +16,11 @@
   // Проервка совпадения цены
   var priceFilter = function (value) {
     if (filterObject.price === 'middle') {
-      return value >= 10000 && value <= 50000;
+      return value >= LOW_PRICE && value <= HIGH_PRICE;
     } else if (filterObject.price === 'low') {
-      return value < 10000;
+      return value < LOW_PRICE;
     } else if (filterObject.price === 'high') {
-      return value > 50000;
+      return value > HIGH_PRICE;
     }
     return false;
   };
@@ -99,7 +103,7 @@
 
       return filteredKeys.length === Object.keys(filters).length;
     })
-        .slice(0, 5);
+        .slice(0, MAX_VISIBLE_OFFERS);
 
     pinNodes.forEach(function (pinNode) {
       if (filteredPins.includes(pinNode)) {
@@ -109,7 +113,7 @@
       }
 
       if (pinNode.classList.contains('map__pin--active') && pinNode.classList.contains('hidden')) {
-        window.pin.deactivatePin();
+        window.pin.deactivatePinButton();
         window.card.removePopup(document.querySelector('.popup'));
       }
     });
