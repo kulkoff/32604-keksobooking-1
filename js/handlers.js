@@ -25,6 +25,7 @@
     window.pin.setActive(target);
     window.card.removePopup();
     window.card.createPopup(map, target.pinData);
+    window.images.bindListeners();
 
     document.addEventListener('keydown', onPopEscPress); // Закрытие на ESC
 
@@ -165,6 +166,8 @@
 
   // Функция сброса страницы
   var resetPage = function () {
+    window.images.clear();
+    window.images.unbindListeners();
     window.form.disableFields();
     resetCoordinates();
     window.card.removePopup();
@@ -202,6 +205,20 @@
     errorNode.textContent = errorMessage + ' Пожалуйста перезагрузите страницу.';
     document.body.insertAdjacentElement('afterbegin', errorNode);
   };
+
+  // Обработчики загрузки сообщений
+  formData.addEventListener('change', function (evt) {
+    var nameElement = evt.target.name;
+
+    switch (nameElement) {
+      case 'avatar':
+        window.images.readFiles(evt);
+        break;
+      case 'images':
+        window.images.readFiles(evt);
+        break;
+    }
+  });
 
   // Добавляю disable форме
   window.form.disableFields();
