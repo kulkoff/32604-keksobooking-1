@@ -14,7 +14,6 @@
   var pinButtonHeight = parseInt(getComputedStyle(pinMain).height, 10) + parseInt(getComputedStyle(pinMain, 'after').height, 10);
   var pinInitialLeft = pinMain.style.left;
   var pinInitialTop = pinMain.style.top;
-  var clearButton = document.querySelector('.ad-form__reset');
 
   // клик на нажатие пина
   pinContainer.addEventListener('click', function (e) {
@@ -229,7 +228,7 @@
   pinMain.addEventListener('mouseup', window.map.drawPins);
 
   // Клик на нажатие кнопки очистить
-  clearButton.addEventListener('click', resetPage);
+  formReset.addEventListener('click', resetPage);
 
 
 })();
