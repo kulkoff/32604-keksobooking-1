@@ -4,8 +4,8 @@
 
   var ROOMS_TO_CAPACITY = {
     '1': [2],
-    '2': [2, 1],
-    '3': [2, 1, 0],
+    '2': [1, 2],
+    '3': [0, 1, 2],
     '100': [3]
   };
   var TYPES_MIN_PRICES = {
@@ -23,23 +23,16 @@
   var numberOfRoom = document.querySelector('#room_number');
   var capacityRoom = document.querySelector('#capacity');
 
-  var onRoomSelectChange = function (e) {
+  numberOfRoom.addEventListener('change', function (e) {
     var roomsNumber = e.target.value;
     var indexesToEnable = ROOMS_TO_CAPACITY[roomsNumber];
 
     for (var i = 0; i < capacityRoom.length; i++) {
-      capacityRoom.options[i].disabled = true;
+      capacityRoom.options[i].disabled = !indexesToEnable.includes(i);
       capacityRoom.options[i].selected = false;
-
-      if (indexesToEnable.includes(i)) {
-        capacityRoom.options[i].disabled = false;
-      }
     }
-    if (roomsNumber) {
-      capacityRoom.options[indexesToEnable[indexesToEnable.length - 1]].selected = true;
-    }
-  };
-  numberOfRoom.addEventListener('change', onRoomSelectChange);
+    capacityRoom.options[indexesToEnable[0]].selected = true;
+  });
 
   // Синхронизация типа жилья с ценой
   var changePriceInput = function (price) {
@@ -53,14 +46,12 @@
   typeRoom.addEventListener('change', onHousingTypeChange);
 
   // Синхронизация времени;
-  var onTimeInChange = function (e) {
+  timeIn.addEventListener('change', function (e) {
     timeOut.value = e.target.value;
-  };
-  var onTimeOutChange = function (e) {
+  });
+  timeOut.addEventListener('change', function (e) {
     timeIn.value = e.target.value;
-  };
-  timeIn.addEventListener('change', onTimeInChange);
-  timeOut.addEventListener('change', onTimeOutChange);
+  });
 
   window.form = {
     enableFields: function () {
@@ -71,6 +62,7 @@
       map.classList.remove('map--faded');
       form.classList.remove('ad-form--disabled');
     },
+
     disableFields: function () {
       var formFieldsets = document.querySelectorAll('.ad-form fieldset');
       for (var i = 0; i < formFieldsets.length; i++) {

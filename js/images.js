@@ -40,6 +40,7 @@
         var placePhoto = document.createElement('img');
         placePhoto.style.width = PHOTO_SIZE + 'px';
         placePhoto.style.height = PHOTO_SIZE + 'px';
+        placePhoto.draggable = true;
         previewPlace.appendChild(placePhoto);
         placePhoto.src = reader.result;
       });
@@ -47,6 +48,18 @@
       reader.readAsDataURL(file);
     }
   });
+
+  var imageContainer = document.querySelector('.ad-form__photo');
+  var draggedItem = null;
+
+  imageContainer.addEventListener('dragstart', function (evt) {
+    if (evt.target.tagName.toLowerCase() === 'img') {
+      draggedItem = evt.target;
+      evt.dataTransfer.setData('text/plain', evt.target.alt);
+    }
+  });
+
+  
 
   window.photo = {
     previewAvatar: previewAvatar,

@@ -22,7 +22,7 @@
     if (target.tagName !== 'BUTTON' || target.classList.contains('map__pin--main')) {
       return;
     }
-    window.pin.changeSelectPinActive(target);
+    window.pin.setActive(target);
     window.card.removePopup();
     window.card.createPopup(map, target.pinData);
 
@@ -34,7 +34,7 @@
     var target = e.target;
     if (target.tagName === 'BUTTON' && target.classList.contains('popup__close')) {
       window.card.removePopup();
-      window.pin.changeSelectPinActive(target);
+      window.pin.setActive(target);
     }
 
   });
@@ -43,7 +43,7 @@
     var target = e.target;
     if (target.tagName === 'BUTTON' && target.classList.contains('popup__close') && e.keyCode === ENTER_KEYCODE) {
       window.card.removePopup();
-      window.pin.changeSelectPinActive(target);
+      window.pin.setActive(target);
     }
 
   });
@@ -53,7 +53,7 @@
     var popup = document.querySelector('.popup');
     if (popup && evt.keyCode === ESC_KEYCODE) {
       window.card.removePopup();
-      window.pin.deactivatePinButton();
+      window.pin.deactivate();
       document.removeEventListener('keydown', onPopEscPress);
     }
   };
@@ -63,7 +63,7 @@
     if (e.target.tagName !== 'BUTTON' || e.target.classList.contains('map__pin--main') || e.keyCode !== ENTER_KEYCODE) {
       return;
     }
-    window.pin.changeSelectPinActive(e.target);
+    window.pin.setActive(e.target);
     window.card.removePopup();
     window.card.createPopup(e.target.pinData);
 

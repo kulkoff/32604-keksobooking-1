@@ -13,7 +13,7 @@
       if (map.classList.contains('map--faded')) {
         for (var id = 0; id <= 9; id++) {
           var pinData = window.map.dataPins[id];
-          var pinNode = window.pin.createPinButton(pinData);
+          var pinNode = window.pin.create(pinData);
           pinNode.pinData = pinData;
           fragmentPin.appendChild(pinNode);
         }

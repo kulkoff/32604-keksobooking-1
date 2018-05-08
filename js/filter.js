@@ -113,7 +113,7 @@
       }
 
       if (pinNode.classList.contains('map__pin--active') && pinNode.classList.contains('hidden')) {
-        window.pin.deactivatePinButton();
+        window.pin.deactivate();
         window.card.removePopup(document.querySelector('.popup'));
       }
     });
