@@ -169,6 +169,7 @@
     window.images.clear();
     window.images.unbindListeners();
     window.form.disableFields();
+    formData.reset();
     resetCoordinates();
     window.card.removePopup();
     var pinNodes = Array.from(pinContainer.children).slice(2);
@@ -179,7 +180,7 @@
   };
 
   var onSuccessCallback = function () {
-    formReset.click();
+    resetPage();
     successBlock.classList.remove('hidden');
     resetCoordinates();
     resetPage();
